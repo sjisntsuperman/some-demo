@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "configs/*": [
+        "configs/*"
+      ],
+      "utils/*": [
+        "utils/*"
+      ],
+      "models/*": [
+        "models/*"
+      ],
+      "services/*": [
+        "services/*"
+      ]
+    },
+    "typeRoots": ["./@types"],
+    "allowJs": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "sourceMap": true,
+    "lib": [
+      "es7"
+    ],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "esnext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "test"
+  ]
+}

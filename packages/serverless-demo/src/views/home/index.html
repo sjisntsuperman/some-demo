@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        {{githubcss}}
+        {{homecss}}
+    </style>
+</head>
+<body>
+    <div class="blog-home">
+        {{each blogList}}
+        <div class="post" onclick="location.href='./post/{{$value.id}}'">
+            <h1>{{$value.title}}</h2>
+            <div class="markdown-body">{{@ $value.content}}</div>
+        </div>
+        {{/each}}
+    </div>
+</body>
+</html>
