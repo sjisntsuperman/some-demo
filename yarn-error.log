@@ -1,0 +1,47 @@
+Arguments: 
+  /usr/local/bin/node /usr/bin/yarn --proxy http://192.168.50.254:4444
+
+PATH: 
+  /usr/local/sqlite3/bin:/home/steinwei/gems/bin:/home/steinwei/.rvm/bin:/home/steinwei/gems/bin:/home/steinwei/.deno/bin:/usr/local/go/bin:/usr/local/sqlite3/bin:/home/steinwei/gems/bin:/home/steinwei/.rvm/bin:/home/steinwei/gems/bin:/home/steinwei/.deno/bin:/usr/local/lib/jdk1.8.0_261/bin:/home/steinwei/.rvm/gems/ruby-2.6.3/bin:/home/steinwei/.rvm/gems/ruby-2.6.3@global/bin:/home/steinwei/.rvm/rubies/ruby-2.6.3/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/sbin:/usr/sbin:/snap/bin:/home/steinwei/.rvm/bin:/usr/local/mongodb/bin:/usr/local/go/bin:/usr/local/mongodb/bin:/home/steinwei/.rvm/bin:/home/steinwei/.rvm/bin:/usr/local/go/bin:/usr/local/mongodb/bin:/home/steinwei/.rvm/bin
+
+Yarn version: 
+  1.22.4
+
+Node version: 
+  14.4.0
+
+Platform: 
+  linux x64
+
+Trace: 
+  Error: ENOENT: no such file or directory, copyfile '/home/steinwei/.cache/yarn/v6/npm-ansi-escapes-3.2.0-8780b98ff9dbf5638152d1f1fe5c1d7b4442976b-integrity/node_modules/ansi-escapes/index.js' -> '/media/steinwei/_dde_data/web-project/interview-demo/node_modules/@lerna/prompt/node_modules/ansi-escapes/index.js'
+
+npm manifest: 
+  {
+    "name": "root",
+    "private": true,
+    "scripts": {
+      "lint-stage": "eslint --fix src/**/*{.js|.ts}"
+    },
+    "husky":{
+      "hook":{
+        "pre-commit":"lint-stage"
+      }
+    },
+    "devDependencies": {
+      "@typescript-eslint/eslint-plugin": "^2.31.0",
+      "@typescript-eslint/parser": "^2.31.0",
+      "eslint": "^6.8.0",
+      "eslint-config-prettier": "^6.11.0",
+      "eslint-plugin-prettier": "^3.1.3",
+      "lerna": "^3.20.2",
+      "prettier": "^2.0.5"
+    },
+    "dependencies": {}
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

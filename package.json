@@ -4,9 +4,9 @@
   "scripts": {
     "lint-stage": "eslint --fix src/**/*{.js|.ts}"
   },
-  "husky":{
-    "hook":{
-      "pre-commit":"lint-stage"
+  "husky": {
+    "hook": {
+      "pre-commit": "lint-stage"
     }
   },
   "devDependencies": {
@@ -18,5 +18,7 @@
     "lerna": "^3.20.2",
     "prettier": "^2.0.5"
   },
-  "dependencies": {}
+  "dependencies": {
+    "ts-node": "^9.0.0"
+  }
 }
