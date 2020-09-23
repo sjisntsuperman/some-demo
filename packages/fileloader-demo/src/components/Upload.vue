@@ -6,8 +6,20 @@
       upload here
     </button>
     <span>
-      {{Math.floor(hashPercentage)}}
+      {{ Math.floor(hashPercentage) }}
     </span>
+    <div class="status">
+      status: {{ status }}
+    </div>
+    <div class="msg">
+      msg: {{msg}}
+    </div>
+    <button @click="pause">
+      pause here
+    </button>
+    <button @click="resume">
+      resume here
+    </button>
     <div v-for="file in data" :key="file.hash">
       <span>
         {{ file.hash }}
@@ -21,23 +33,23 @@
 
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator'
-import {asyncPool, fetch} from '../fetch/index'
+import {asyncPool, fetch, prefix} from '../fetch/index'
 
 interface CustomTS {
-  [propName: string]: any
+  [propName: string]: any | null
 }
 
 const SIZE = 10 * 1024 * 1024
-// const STATUS = {
-//   PAUSE: Symbol('pause'),
-//   UPLOAD: Symbol('uploading'),
-//   FULFILLED: Symbol('fulfilled'),
-// }
+const STATUS = {
+  PAUSED: 'paused',
+  PENDING: 'pending',
+  FULFILLED: 'fulfilled',
+}
 
 @Component
-export default class HelloWorld extends Vue {
+export default class Upload extends Vue {
   /** props  */
-  @Prop() private msg!: string
+  @Prop() private name!: string
 
   /** state  */
   container: CustomTS = {}
@@ -45,18 +57,64 @@ export default class HelloWorld extends Vue {
   hashPercentage = 0
   data: Array<object> = []
   uploadedList: Array<number> = []
+  requestList: Array<XMLHttpRequest> = []
+  status: string = STATUS.PAUSED
+  msg = 'here is msg'
 
   /**methods */
   onFileChange = (e: any) => {
+    // 当临时替换文件时
+    // this.reset()
     const [file] = e.target.files
     this.container.file = file
-    // fetch({
-    //   url: 'http://localhost:4000',
-    //   method: 'get'
-    // })
+    // console.log(this.container)
   }
 
-  createChunks(file: File) {
+  pause() {
+    this.status = STATUS.PAUSED
+    this.msg = 'you have been pause the uploads'
+    this.reset()
+  }
+
+  reset() {
+    // 拒绝剩下的请求
+    if (this.requestList.length) {
+      this.requestList.forEach((xhr: XMLHttpRequest) => xhr.abort())
+    }
+    // 置空
+    this.requestList = []
+    this.container = {}
+    this.data = []
+    this.uploadedList = []
+  }
+
+  // 恢复上传
+  resume(){
+    this.upload()
+  }
+
+  async checkChunks() {
+    const params: CustomTS = {
+      filehash: this.container.hash,
+      filename: this.container.file.name,
+      hash: this.container.hash,
+    }
+    const data = await fetch({
+      url: prefix + 'check',
+      headers: {
+        'content-type': 'application/json',
+      },
+      data: JSON.stringify(params),
+    })
+    console.log(data)
+    debugger
+    const {
+      uploadedList = []
+    } = JSON.parse(data?.data)
+    this.uploadedList = [...uploadedList]
+  }
+
+  createChunks(file:Blob) {
     const chunks = []
     let cur = 0
     while (cur < file.size) {
@@ -67,11 +125,14 @@ export default class HelloWorld extends Vue {
   }
 
   async upload() {
+    console.log(this.container)
     if (!this.container.file) return
     const chunks = await this.createChunks(this.container.file)
-    // console.log(chunks)
     this.container.hash = await this.creatHash(chunks)
-    
+
+    // 先检查有没已上传的文件列表
+    await this.checkChunks()
+
     this.data = chunks.map(({file}, index) => ({
       filename: this.container.file.name,
       fileHash: this.container.hash,
@@ -85,37 +146,46 @@ export default class HelloWorld extends Vue {
   }
 
   async uploadChunks() {
-    const requestList:CustomTS = this.data.map((fileInfo: CustomTS) => {
-      const {index} = fileInfo
-      const form:FormData = this.createFormData(fileInfo, 'chunk', 'hash', 'fileHash', 'filename')
-      return {
-        url: 'http://localhost:4000/upload',
-        data: form,
-        onProgress: this.progressHandler(this.data[index])
-      }
+    // 避免重新传已有的文件
+    const requestList: CustomTS = this.data
+      .filter((flieInfo: CustomTS) => !this.uploadedList.includes(flieInfo.hash))
+      .map((fileInfo: CustomTS) => {
+        const {index} = fileInfo
+        const form: FormData = this.createFormData(fileInfo, 'chunk', 'hash', 'fileHash', 'filename')
+        return {
+          url: prefix + 'upload',
+          data: form,
+          onProgress: this.progressHandler(this.data[index]),
+          requestList: this.requestList,
+        }
+      })
+    this.status = STATUS.PENDING
+    this.msg = 'file is been uploading'
+    //请求并发限制
+    await asyncPool(4, requestList, fetch)
+    this.mergeChunk().then(() => {
+      this.status = STATUS.FULFILLED
+      this.msg = 'file has been uploaded'
     })
-    //
-    await asyncPool(4, requestList, fetch);
-    this.mergeChunk()
   }
 
-  progressHandler (fileInfo: CustomTS) {
+  progressHandler(fileInfo: CustomTS) {
     return (e: ProgressEvent) => {
       fileInfo.progress = Math.floor(e.loaded / e.total) / 100
     }
   }
 
-  createFormData (info: CustomTS, ...keys: Array<string>) {
-    const form:FormData = new FormData()
+  createFormData(info: CustomTS, ...keys: Array<string>) {
+    const form: FormData = new FormData()
     Object.keys(info).forEach(key => {
-      if (keys.some(it => it == key)) {
+      if (keys.includes(key)) {
         form.set(key, info[key])
       }
     })
     return form
   }
 
-  creatHash (chunks: Array<object>) {
+  creatHash(chunks: Array<object>) {
     return new Promise(resolve => {
       this.container.worker = new Worker('/hash.js')
       this.container.worker.postMessage({chunks})
@@ -133,17 +203,17 @@ export default class HelloWorld extends Vue {
     return chunk.slice(idx, idx * this.chunksize)
   }
 
-  mergeChunk(){
+  mergeChunk() {
     return fetch({
       url: 'http://localhost:4000/merge',
-      headers:{
-        'content-type': 'application/json'
+      headers: {
+        'content-type': 'application/json',
       },
       data: JSON.stringify({
         filename: this.container.file.name,
         size: SIZE,
-        fileHash: this.container.hash
-      })
+        fileHash: this.container.hash,
+      }),
     })
   }
 }
@@ -164,5 +234,11 @@ li {
 }
 a {
   color: #42b983;
+}
+.msg{
+  color: greenyellow;
+}
+.status{
+  color: aqua;
 }
 </style>

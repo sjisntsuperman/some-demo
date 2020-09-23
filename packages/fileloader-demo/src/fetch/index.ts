@@ -5,21 +5,27 @@ interface CustomT {
 type requestOptions = {
   url?: string
   method?: string
-  data?: FormData
+  data?: FormData|string
   headers?: CustomT
   onProgress?: {
     (this: XMLHttpRequest, ev: ProgressEvent) : any | null
   },
-  requestList?: any[]
+  requestList?: Array<XMLHttpRequest>
 }
 
-export const fetch :Function= ({
+interface fetchMethod {
+  (propName: requestOptions): Promise<any>
+}
+
+export const prefix = 'http://localhost:4000/'
+
+export const fetch :fetchMethod= ({
   url='',
   method = 'post',
-  data=new FormData(),
+  data='',
   headers = {},
   onProgress = (e: ProgressEvent<EventTarget>) => e,
-  requestList,
+  requestList = []
 }: requestOptions) => {
   return new Promise((resolve) => {
     const xhr: XMLHttpRequest = new XMLHttpRequest()
@@ -32,6 +38,7 @@ export const fetch :Function= ({
         data: e?.target?.response,
       })
     }
+    requestList.push(xhr)
   })
 }
 

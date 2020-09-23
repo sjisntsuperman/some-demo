@@ -14,18 +14,15 @@ server.on("request", async (req, res) => {
   }
 
   if(req.url === '/'){
-    logger.info("route:%s", req.url)
     return res.end("Hello UploadLoader");
   }
 
-  if (req.url === "/verify") {
-    logger.info("route:%s", req.url)
+  if (req.url === "/check") {
     await CheckChunkController(req, res);
     return;
   }
 
   if (req.url === "/merge") {
-    logger.info("route:%s", req.url)
     await MergeController(req, res);
     return;
   }
