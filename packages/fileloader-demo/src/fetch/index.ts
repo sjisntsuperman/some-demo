@@ -5,38 +5,33 @@ interface CustomT {
 type requestOptions = {
   url?: string
   method?: string
-  data?: object
+  data?: FormData
   headers?: CustomT
-  onProgress?: Function
+  onProgress?: {
+    (this: XMLHttpRequest, ev: ProgressEvent) : any | null
+  },
   requestList?: any[]
 }
 
-export const fetch = ({
-  url,
+export const fetch :Function= ({
+  url='',
   method = 'post',
-  data,
+  data=new FormData(),
   headers = {},
-  onProgress = (e: CustomEvent) => e,
+  onProgress = (e: ProgressEvent<EventTarget>) => e,
   requestList,
 }: requestOptions) => {
-  return new Promise(resolve => {
-    const xhr: any = new XMLHttpRequest()
+  return new Promise((resolve) => {
+    const xhr: XMLHttpRequest = new XMLHttpRequest()
     xhr.upload.onprogress = onProgress
     xhr.open(method, url)
     Object.keys(headers).forEach(key => xhr.setRequestHeader(key, headers[key]))
     xhr.send(data)
     xhr.onload = (e: any) => {
-      // 将请求成功的 xhr 从列表中删除
-      if (requestList) {
-        const xhrIndex = requestList.findIndex(item => item === xhr)
-        requestList.splice(xhrIndex, 1)
-      }
       resolve({
         data: e?.target?.response,
       })
     }
-    // 暴露当前 xhr 给外部
-    requestList?.push(xhr)
   })
 }
 
@@ -46,7 +41,7 @@ export const fetch = ({
  * @param requestList
  */
 
-export const asyncPool: Function = async (maxLimit: number, requestList: Promise<void>[]) => {
+export const asyncPool: Function = (maxLimit: number, requestList: Array<object>, iteratorFn:Function) => {
   const executing: Promise<void>[] = []
   const res: Promise<void>[] = []
   let i = 0
@@ -56,13 +51,13 @@ export const asyncPool: Function = async (maxLimit: number, requestList: Promise
       return Promise.resolve(res)
     }
 
-    const request: Promise<void> = requestList[i++]
+    const requestOptions = requestList[i++]
+    const request: Promise<any> = Promise.resolve().then(()=>iteratorFn(requestOptions));
     res.push(request)
     const block: Promise<any> = request
       .then(() => {
         return executing.splice(executing.indexOf(request), 1)
       })
-      .then(() => console.log(i))
     executing.push(block)
 
     let r = Promise.resolve()

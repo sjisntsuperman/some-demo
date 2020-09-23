@@ -13,11 +13,14 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env", "node"
+      "webpack-env", "node", "jest"
     ],
     "paths": {
       "@/*": [
         "src/*"
+      ],
+      "server/*":[
+        "src/server/*"
       ]
     },
     "lib": [

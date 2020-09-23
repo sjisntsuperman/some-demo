@@ -5,6 +5,9 @@
     <button @click="upload">
       upload here
     </button>
+    <span>
+      {{Math.floor(hashPercentage)}}
+    </span>
     <div v-for="file in data" :key="file.hash">
       <span>
         {{ file.hash }}
@@ -42,12 +45,15 @@ export default class HelloWorld extends Vue {
   hashPercentage = 0
   data: Array<object> = []
   uploadedList: Array<number> = []
-  requestList: Array<Promise<any>> = []
 
   /**methods */
   onFileChange = (e: any) => {
     const [file] = e.target.files
     this.container.file = file
+    // fetch({
+    //   url: 'http://localhost:4000',
+    //   method: 'get'
+    // })
   }
 
   createChunks(file: File) {
@@ -63,9 +69,11 @@ export default class HelloWorld extends Vue {
   async upload() {
     if (!this.container.file) return
     const chunks = await this.createChunks(this.container.file)
-    this.container.hash = this.creatHash(chunks)
+    // console.log(chunks)
+    this.container.hash = await this.creatHash(chunks)
     
     this.data = chunks.map(({file}, index) => ({
+      filename: this.container.file.name,
       fileHash: this.container.hash,
       index,
       hash: this.container.hash + '-' + index,
@@ -76,28 +84,29 @@ export default class HelloWorld extends Vue {
     this.uploadChunks()
   }
 
-  uploadChunks = () => {
-    this.requestList = this.data.map((fileInfo: CustomTS) => {
+  async uploadChunks() {
+    const requestList:CustomTS = this.data.map((fileInfo: CustomTS) => {
       const {index} = fileInfo
-      const form = this.createFormData(fileInfo, 'chunk', 'size', 'hash', 'index', 'fileHash')
-      return fetch({
-        url: 'localhost:4000/upload',
+      const form:FormData = this.createFormData(fileInfo, 'chunk', 'hash', 'fileHash', 'filename')
+      return {
+        url: 'http://localhost:4000/upload',
         data: form,
-        onProgress: this.progressHandler(this.data[index]),
-      })
+        onProgress: this.progressHandler(this.data[index])
+      }
     })
     //
-    asyncPool(4, this.requestList)
+    await asyncPool(4, requestList, fetch);
+    this.mergeChunk()
   }
 
-  progressHandler = (fileInfo: CustomTS) => {
+  progressHandler (fileInfo: CustomTS) {
     return (e: ProgressEvent) => {
       fileInfo.progress = Math.floor(e.loaded / e.total) / 100
     }
   }
 
-  createFormData = (info: CustomTS, ...keys: Array<string>) => {
-    const form = new FormData()
+  createFormData (info: CustomTS, ...keys: Array<string>) {
+    const form:FormData = new FormData()
     Object.keys(info).forEach(key => {
       if (keys.some(it => it == key)) {
         form.set(key, info[key])
@@ -106,7 +115,7 @@ export default class HelloWorld extends Vue {
     return form
   }
 
-  creatHash = (chunks: Array<object>) => {
+  creatHash (chunks: Array<object>) {
     return new Promise(resolve => {
       this.container.worker = new Worker('/hash.js')
       this.container.worker.postMessage({chunks})
@@ -122,6 +131,20 @@ export default class HelloWorld extends Vue {
 
   spliceChunk(chunk: ArrayBuffer, idx: number) {
     return chunk.slice(idx, idx * this.chunksize)
+  }
+
+  mergeChunk(){
+    return fetch({
+      url: 'http://localhost:4000/merge',
+      headers:{
+        'content-type': 'application/json'
+      },
+      data: JSON.stringify({
+        filename: this.container.file.name,
+        size: SIZE,
+        fileHash: this.container.hash
+      })
+    })
   }
 }
 </script>

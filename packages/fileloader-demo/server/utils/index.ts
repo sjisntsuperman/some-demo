@@ -1,22 +1,19 @@
-import fs from 'fs';
+import fs, { PathLike } from 'fs';
 import path from 'path';
 import http from 'http';
+import { logger } from './logger';
 
 export const UPLOAD_DIR = path.join(__dirname, '../uploads');
 
-export const resolve =  (pathname:string)=>{
-    return path.join(__dirname, '../', pathname);
-}
-
 export const pipeStream = async (
-    pathname: string,
+    pathname: PathLike,
     writestream: any
 )=>{
     return new Promise((resolve)=>{
-        const readstream=fs.createReadStream(pathname);
+        const readstream=fs.createReadStream(pathname)
         readstream.on('end', ()=>{
-            fs.unlinkSync(pathname);
-            resolve();
+            fs.unlinkSync(pathname)
+            resolve()
         });
         readstream.pipe(writestream);
     })
@@ -33,23 +30,22 @@ export const writeFile = async(pathname:string, content:string)=>{
 }
 
 export const extractExt = (pathname:string) =>{
-    // const extReg=/\w(?=\.)(\w)/;
-    // const ext = extReg.exec(pathname);
-    // return RegExp.$1;
     const point = pathname.indexOf('.');
     const ext = pathname.substr(point+1);
 
     return ext;
 }
 
-export const bodyParser = (req:http.IncomingMessage)=>{
+export const bodyParser = (req:http.IncomingMessage):any=>
+    new Promise(resolve=>{
         let body = '';
         req.on('data', res=>{
+            logger.info(res)
             body+=res;
         });
-        try{
-            return JSON.parse(body);
-        }catch(e){
-            return body;
-        }
-}
+
+        req.on("end", () => {
+            resolve(JSON.parse(body));
+        });
+
+    })

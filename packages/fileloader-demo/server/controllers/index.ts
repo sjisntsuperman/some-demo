@@ -1,10 +1,11 @@
 /* eslint-disable */
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 import http from 'http';
 import multiparty from 'multiparty';
 
-import { isExistDir, resolve, pipeStream,UPLOAD_DIR, extractExt, bodyParser } from '../utils';
+import { isExistDir, pipeStream,UPLOAD_DIR, extractExt, bodyParser } from '../utils';
+import { logger } from '../utils/logger';
 
 type Response = http.ServerResponse;
 type Request = http.IncomingMessage;
@@ -17,11 +18,12 @@ export const UploadController:Controller = async (req, res)=>{
     
         multipart.parse(req, async (err, fields, files) => {
           if (err) {
-            console.error(err);
+            logger.error(err);
             res.statusCode = 500;
             res.end("process file chunk failed");
             return;
           }
+          // logger.info(JSON.stringify(fields))
           const [chunk] = files.chunk;
           const [hash] = fields.hash;
           const [fileHash] = fields.fileHash;
@@ -45,37 +47,38 @@ export const UploadController:Controller = async (req, res)=>{
           // fs-extra 专用方法，类似 fs.rename 并且跨平台
           // fs-extra 的 rename 方法 windows 平台会有权限问题
           // https://github.com/meteor/meteor/issues/7852#issuecomment-255767835
-          await fs.renameSync(chunk.path, path.resolve(chunkDir, hash));
+          await fs.move(chunk.path, path.resolve(chunkDir, hash));
           res.end("received file chunk");
         });
 }
 
 export const MergeController:Controller = async  (req, res)=>{
+    const promisedata:any =await bodyParser(req);
     const {
-        hash, 
-        ext,
-        idx,
-        slice
-    } = bodyParser(req);
-    const files = fs.readdirSync(UPLOAD_DIR);
+      size,
+      filename,
+      fileHash
+  } = promisedata
+    const chunkDir = path.join(UPLOAD_DIR, `${fileHash}`);
+    const files = fs.readdirSync(chunkDir);
+    const ext = extractExt(filename)
     // output dir
-    const pathname = resolve(`${hash}.${ext}`);
+    const pathname = path.join(UPLOAD_DIR, `${fileHash}${ext}`);
     // 避免顺序混乱
-    files.sort((prev,cur)=>Number(prev.split('-')[1]>cur.split('-')[1]));
-    for (let i = 0; i < files.length; i++) {
-        const chunkpath = files[i];
-        await pipeStream(
-            pathname,
-            fs.createWriteStream(chunkpath, {
-                start: slice*idx
-            })
-        );
-    }
-    fs.rmdirSync(UPLOAD_DIR);
-    res.end({
-      status: 200,
-      message: 'ok'
-  });
+    files.sort((prev,cur)=>(Number(prev.split('-')[1])-Number(cur.split('-')[1])));
+    await Promise.all(files.map((chunkpath:string, i:number)=>
+      pipeStream(
+          path.join(chunkDir, chunkpath),
+          fs.createWriteStream(pathname, {
+              start: size*i
+          })
+      )
+    ))
+    fs.rmdirSync(chunkDir);
+    res.end(JSON.stringify({
+      retcode: 0,
+      message: 'merge success'
+  }));
 }
 
 export const CheckChunkController:Controller = async (req, res) =>{
