@@ -1,5 +1,10 @@
-interface CustomTS{
-    [propName: string]: any
+declare global {
+    interface CustomTS{
+        [propName: string]: any
+    }
+    
+    type pathName = string
 }
 
-type pathName = string
+
+export {}

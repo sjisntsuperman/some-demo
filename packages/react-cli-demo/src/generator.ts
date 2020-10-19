@@ -2,7 +2,6 @@ import path from "path";
 import fs from 'fs-extra'
 import yeoman from "yeoman-environment"
 import inquirer from "inquirer";
-import { logger } from "utils/logger";
 
 const yeomanEnv = yeoman.createEnv()
 
@@ -17,6 +16,7 @@ class Generator{
 	init(){
 		const self = this
 		const ctx = this.ctx
+		const logger = ctx.logger
 		this.loadGeneratorList().then((generators)=>{
 			const options = generators.map((item: CustomTS) => {
 				return item.desc
@@ -46,23 +46,19 @@ class Generator{
 		})
 	}
 
-	getLocal(){
-		const home_dir = this.ctx
-	}
-
 	run(name: string){
 		const ctx = this.ctx
-		const plugin_dir = ctx.plugin_dir
-		let pathname = path.join(plugin_dir, name, 'app/index.js')
+		const pluginDir = ctx.pluginDir
+		let pathname = path.join(pluginDir, name, 'app/index.js')
 		yeomanEnv.register(pathname, name)
 		yeomanEnv.run(name, ctx, ()=>{})
 	}
 
 	async loadGeneratorList(){
 		const ctx = this.ctx
-		const base_dir = ctx.base_dir
-		const pkg_dir = path.join(base_dir, 'package.json')
-		const plugin_dir = ctx.plugin_dir
+		const baseDir = ctx.baseDir
+		const pkg_dir = path.join(baseDir, 'package.json')
+		const pluginDir = ctx.pluginDir
 
 		const deps_arr: Promise<string[]> = fs.readFile(pkg_dir).then((content: any)=>{
 			const json = JSON.parse(content);
@@ -72,13 +68,14 @@ class Generator{
 		});
 		const res = (await deps_arr).filter(function (name) {
 			// Find yeoman generator.
+			// generator-ivweb
 			if (!/^generator-|^@[^/]+\/generator-/.test(name)) return false;
 	  
 			// Make sure the generator exists
-			const pathname = path.join(plugin_dir, name);
+			const pathname = path.join(pluginDir, name);
 			return fs.existsSync(pathname);
 		  }).map(function (name) {
-			const pathname = path.join(plugin_dir, name);
+			const pathname = path.join(pluginDir, name);
 			let packagePath = path.join(pathname, 'package.json');
 	  
 			// Read generator config.
@@ -91,6 +88,9 @@ class Generator{
 		})
 		return res
 	}
+}
 
-	installTemplate(){}
+export default (ctx: CustomTS) => {
+	const cmd = ctx.cmd
+	cmd.register("init", ()=>new Generator(ctx).init())
 }

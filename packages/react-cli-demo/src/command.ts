@@ -1,10 +1,12 @@
+import { EventEmitter } from "events";
 
 export
-class Command{
+class Command extends EventEmitter{
 	alias: CustomTS
 	store: CustomTS
 
 	constructor(){
+		super()
 		this.alias = {}
 		this.store = {}
 	}
@@ -15,7 +17,7 @@ class Command{
 
 	list(){}
 
-	register(name:string, value:any){
+	register(name:string, value: Function){
 		return this.alias[name] = value
 	}
 }

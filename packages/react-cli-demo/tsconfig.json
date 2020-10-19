@@ -10,7 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "lib": [
       "es7"
     ],
