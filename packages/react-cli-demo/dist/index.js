@@ -92,7 +92,7 @@ const entry = () => {
         if (!c)
             cmd = 'help';
         return demo.call(cmd, args).then(() => {
-            demo.logger.info('cmd started');
+            demo.logger.info(`${cmd} done`);
         });
     });
 };

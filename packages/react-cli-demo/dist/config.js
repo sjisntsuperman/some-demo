@@ -12,13 +12,17 @@ class Config {
         const workDir = process_1.default.cwd();
         const configPath = path_1.default.join(workDir, 'cli-demo.json');
         const config = await fs_extra_1.default.readFileSync(configPath);
-        const json = JSON.parse(JSON.stringify(config));
-        return json;
+        const json = JSON.parse(config.toString());
+        console.log(json);
+        return new Promise(resolve => {
+            resolve(json);
+        });
     }
-    static async getBuilderType() {
-        const json = await Config.getLocal();
-        const builderType = json.builderType;
-        return builderType;
+    static getBuilderType() {
+        return Config.getLocal().then((json) => {
+            const builderType = json.builderType;
+            return builderType;
+        });
     }
 }
 exports.Config = Config;

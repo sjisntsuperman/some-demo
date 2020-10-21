@@ -17,7 +17,7 @@ class Generator {
         const self = this;
         const ctx = this.ctx;
         const logger = ctx.logger;
-        this.loadGeneratorList().then((generators) => {
+        return this.loadGeneratorList().then((generators) => {
             const options = generators.map((item) => {
                 return item.desc;
             });
@@ -45,39 +45,39 @@ class Generator {
     run(name) {
         const ctx = this.ctx;
         const pluginDir = ctx.pluginDir;
-        let pathname = path_1.default.join(pluginDir, name, 'app/index.js');
+        let pathname = path_1.default.join(pluginDir, name, 'generators/app/index.js');
         yeomanEnv.register(pathname, name);
         yeomanEnv.run(name, ctx, () => { });
     }
-    async loadGeneratorList() {
+    loadGeneratorList() {
         const ctx = this.ctx;
         const baseDir = ctx.baseDir;
         const pkg_dir = path_1.default.join(baseDir, 'package.json');
         const pluginDir = ctx.pluginDir;
-        const deps_arr = fs_extra_1.default.readFile(pkg_dir).then((content) => {
+        return fs_extra_1.default.readFile(pkg_dir).then((content) => {
             const json = JSON.parse(content);
             const deps = json.dependencies || json.devDependencies || {};
             return Object.keys(deps);
-        });
-        const res = (await deps_arr).filter(function (name) {
-            // Find yeoman generator.
-            // generator-ivweb
-            if (!/^generator-|^@[^/]+\/generator-/.test(name))
-                return false;
-            // Make sure the generator exists
-            const pathname = path_1.default.join(pluginDir, name);
-            return fs_extra_1.default.existsSync(pathname);
-        }).map(function (name) {
-            const pathname = path_1.default.join(pluginDir, name);
-            let packagePath = path_1.default.join(pathname, 'package.json');
-            // Read generator config.
-            return fs_extra_1.default.readFile(packagePath).then(function (content) {
-                const json = JSON.parse(content);
+        }).then((names) => {
+            const res = names.filter((name) => {
+                if (!/generator-/.test(name))
+                    return false;
+                // generator-ivweb
+                // @steinwei/generator-cli-demo
+                // Make sure the generator exists
+                const pathname = path_1.default.join(pluginDir, name);
+                return fs_extra_1.default.existsSync(pathname);
+            }).map((name) => {
+                const pathname = path_1.default.join(pluginDir, name);
+                let packagePath = path_1.default.join(pathname, 'package.json');
+                // Read generator config.
+                let content = fs_extra_1.default.readFileSync(packagePath);
+                const json = JSON.parse(content.toString());
                 const desc = json.description;
                 return { name, desc };
             });
+            return res;
         });
-        return res;
     }
 }
 exports.Generator = Generator;

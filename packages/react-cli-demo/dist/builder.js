@@ -35,8 +35,9 @@ class Builder {
     }
     runBuild(cmd) {
         const self = this;
-        const { log, pluginDir, baseDir } = this.ctx;
-        config_1.Config.getBuilderType().then((type) => {
+        const { log, pluginDir, baseDir, logger } = this.ctx;
+        return config_1.Config.getBuilderType().then((type) => {
+            logger.debug(type);
             const pathname = path_1.default.join(pluginDir, type);
             if (!fs_extra_1.default.existsSync(pathname)) {
                 log.info(`检测到您本地没有安装${type}构建器, 即将为您安装...`);
@@ -51,9 +52,9 @@ class Builder {
                 });
             }
             else {
-                console.log('path', path_1.default);
+                // console.log('path', path);
                 // return this.checkUpdate().then(() => {
-                //   require(pathname)(cmd, self.ctx);
+                require(pathname)(cmd, self.ctx);
                 // });
             }
         });
@@ -94,5 +95,6 @@ class Builder {
 exports.Builder = Builder;
 exports.default = (ctx) => {
     const cmd = ctx.cmd;
-    return cmd.register("build", (argv) => new Builder(ctx).runBuild(argv));
+    cmd.register("dev", () => new Builder(ctx).runBuild("dev"));
+    return cmd.register("build", () => new Builder(ctx).runBuild("build"));
 };

@@ -1,5 +1,5 @@
 import fs from "fs-extra";
-import path from "path";
+import path, { resolve } from "path";
 import process from 'process';
 
 export
@@ -9,18 +9,20 @@ class Config {
         const workDir = process.cwd()
         const configPath = path.join(workDir, 'cli-demo.json')
         const config = await fs.readFileSync(configPath)
-        const json = JSON.parse(JSON.stringify(config))
+        const json = JSON.parse(config.toString())
 
-        return json
+        console.log(json)
+
+        return new Promise(resolve=>{
+            resolve(json)
+        })
     }
 
-    static async getBuilderType() {
-
-        const json = await Config.getLocal()
-
-        const builderType = json.builderType
-
-        return builderType
+    static getBuilderType() {
+        return Config.getLocal().then((json: CustomTS)=>{
+            const builderType = json.builderType
+            return builderType
+        })
     }
 
 }

@@ -3,8 +3,6 @@ import fs from 'fs-extra'
 import spawn from "cross-spawn"
 import { Config } from './config'
 
-type argvType = 'build' | 'dev'
-
 export
 class Builder{
 
@@ -39,8 +37,9 @@ class Builder{
 
   runBuild(cmd: string) {
     const self = this;
-    const { log, pluginDir, baseDir } = this.ctx;
-    Config.getBuilderType().then((type: string) => {
+    const { log, pluginDir, baseDir, logger } = this.ctx;
+    return Config.getBuilderType().then((type: string) => {
+      logger.debug(type)
       const pathname = path.join(pluginDir, type);
 
       if (!fs.existsSync(pathname)) {
@@ -55,9 +54,9 @@ class Builder{
           }
         });
       } else {
-        console.log('path', path);
+        // console.log('path', path);
         // return this.checkUpdate().then(() => {
-        //   require(pathname)(cmd, self.ctx);
+            require(pathname)(cmd, self.ctx);
         // });
       }
     });
@@ -106,5 +105,7 @@ class Builder{
 export default (ctx: CustomTS) => {
   const cmd = ctx.cmd;
 
-  return cmd.register("build", (argv: string) => new Builder(ctx).runBuild(argv));
+  cmd.register("dev", () => new Builder(ctx).runBuild("dev"));
+
+  return cmd.register("build", () => new Builder(ctx).runBuild("build"));
 }

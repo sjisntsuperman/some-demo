@@ -4,10 +4,9 @@ import Generator from 'yeoman-generator';
 
 export default class extends Generator {
 
-  answers: CustomTS;
 
   constructor() {
-    super([], null);
+    super(...arguments);
 
     this.answers = {};
   }
@@ -79,7 +78,6 @@ export default class extends Generator {
     logger.info('本次初始化过程结束, 请通过以下命令运行项目: ');
     console.log();
     console.log(chalk.cyan('  cd'), name);
-    console.log(`  ${chalk.cyan('feflow dev')}`);
     console.log();
     logger.info('编码愉快!');
   }
