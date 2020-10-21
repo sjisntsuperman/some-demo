@@ -909,12 +909,32 @@
   resolved "https://registry.npm.taobao.org/@types/color-name/download/@types/color-name-1.1.1.tgz#1c1261bbeaa10a8055bbc5d8ab84b7b2afc846a0"
   integrity sha1-HBJhu+qhCoBVu8XYq4S3sq/IRqA=
 
+"@types/debug@*":
+  version "4.1.5"
+  resolved "https://registry.npm.taobao.org/@types/debug/download/@types/debug-4.1.5.tgz#b14efa8852b7768d898906613c23f688713e02cd"
+  integrity sha1-sU76iFK3do2JiQZhPCP2iHE+As0=
+
+"@types/diff@*":
+  version "4.0.2"
+  resolved "https://registry.npm.taobao.org/@types/diff/download/@types/diff-4.0.2.tgz#2e9bb89f9acc3ab0108f0f3dc4dbdcf2fff8a99c"
+  integrity sha1-Lpu4n5rMOrAQjw89xNvc8v/4qZw=
+
+"@types/ejs@*":
+  version "3.0.5"
+  resolved "https://registry.npm.taobao.org/@types/ejs/download/@types/ejs-3.0.5.tgz#95a3a1c3d9603eba80fe67ff56da1ba275ef2eda"
+  integrity sha1-laOhw9lgPrqA/mf/VtobonXvLto=
+
 "@types/eslint-visitor-keys@^1.0.0":
   version "1.0.0"
   resolved "https://registry.npm.taobao.org/@types/eslint-visitor-keys/download/@types/eslint-visitor-keys-1.0.0.tgz#1ee30d79544ca84d68d4b3cdb0af4f205663dd2d"
   integrity sha1-HuMNeVRMqE1o1LPNsK9PIFZj3S0=
 
-"@types/glob@^7.1.1":
+"@types/expect@^1.20.4":
+  version "1.20.4"
+  resolved "https://registry.npm.taobao.org/@types/expect/download/@types/expect-1.20.4.tgz#8288e51737bf7e3ab5d7c77bfa695883745264e5"
+  integrity sha1-gojlFze/fjq118d7+mlYg3RSZOU=
+
+"@types/glob@*", "@types/glob@^7.1.1":
   version "7.1.3"
   resolved "https://registry.npm.taobao.org/@types/glob/download/@types/glob-7.1.3.tgz?cache=0&sync_timestamp=1596841521267&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fglob%2Fdownload%2F%40types%2Fglob-7.1.3.tgz#e6ba80f36b7daad2c685acd9266382e68985c183"
   integrity sha1-5rqA82t9qtLGhazZJmOC5omFwYM=
@@ -922,10 +942,38 @@
     "@types/minimatch" "*"
     "@types/node" "*"
 
-"@types/json-schema@^7.0.3":
+"@types/inquirer@*":
+  version "7.3.1"
+  resolved "https://registry.npm.taobao.org/@types/inquirer/download/@types/inquirer-7.3.1.tgz#1f231224e7df11ccfaf4cf9acbcc3b935fea292d"
+  integrity sha1-HyMSJOffEcz69M+ay8w7k1/qKS0=
+  dependencies:
+    "@types/through" "*"
+    rxjs "^6.4.0"
+
+"@types/json-schema@*", "@types/json-schema@^7.0.3":
   version "7.0.6"
   resolved "https://registry.npm.taobao.org/@types/json-schema/download/@types/json-schema-7.0.6.tgz#f4c7ec43e81b319a9815115031709f26987891f0"
   integrity sha1-9MfsQ+gbMZqYFRFQMXCfJph4kfA=
+
+"@types/mem-fs-editor@*":
+  version "7.0.0"
+  resolved "https://registry.npm.taobao.org/@types/mem-fs-editor/download/@types/mem-fs-editor-7.0.0.tgz#e6576e0f66e20055481b2cdbf193457f1a2c4e65"
+  integrity sha1-5lduD2biAFVIGyzb8ZNFfxosTmU=
+  dependencies:
+    "@types/ejs" "*"
+    "@types/glob" "*"
+    "@types/json-schema" "*"
+    "@types/mem-fs" "*"
+    "@types/node" "*"
+    "@types/vinyl" "*"
+
+"@types/mem-fs@*":
+  version "1.1.2"
+  resolved "https://registry.npm.taobao.org/@types/mem-fs/download/@types/mem-fs-1.1.2.tgz#e7e4cc741225dea109b5f3ceb519b45f353e1393"
+  integrity sha1-5+TMdBIl3qEJtfPOtRm0XzU+E5M=
+  dependencies:
+    "@types/node" "*"
+    "@types/vinyl" "*"
 
 "@types/minimatch@*":
   version "3.0.3"
@@ -946,6 +994,56 @@
   version "2.4.0"
   resolved "https://registry.npm.taobao.org/@types/normalize-package-data/download/@types/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha1-5IbQ2XOW15vu3QpuM/RTT/a0lz4=
+
+"@types/text-table@*":
+  version "0.2.1"
+  resolved "https://registry.npm.taobao.org/@types/text-table/download/@types/text-table-0.2.1.tgz#39c4d4a058a82f677392dfd09976e83d9b4c9264"
+  integrity sha1-OcTUoFioL2dzkt/QmXboPZtMkmQ=
+
+"@types/through@*":
+  version "0.0.30"
+  resolved "https://registry.npm.taobao.org/@types/through/download/@types/through-0.0.30.tgz#e0e42ce77e897bd6aead6f6ea62aeb135b8a3895"
+  integrity sha1-4OQs536Je9aurW9upirrE1uKOJU=
+  dependencies:
+    "@types/node" "*"
+
+"@types/vinyl@*":
+  version "2.0.4"
+  resolved "https://registry.npm.taobao.org/@types/vinyl/download/@types/vinyl-2.0.4.tgz#9a7a8071c8d14d3a95d41ebe7135babe4ad5995a"
+  integrity sha1-mnqAccjRTTqV1B6+cTW6vkrVmVo=
+  dependencies:
+    "@types/expect" "^1.20.4"
+    "@types/node" "*"
+
+"@types/yeoman-environment@*":
+  version "2.10.2"
+  resolved "https://registry.npm.taobao.org/@types/yeoman-environment/download/@types/yeoman-environment-2.10.2.tgz#008b4f7a350ff8fb2be7ad7dda2580ead048ee76"
+  integrity sha1-AItPejUP+Psr56192iWA6tBI7nY=
+  dependencies:
+    "@types/diff" "*"
+    "@types/inquirer" "*"
+    "@types/mem-fs" "*"
+    "@types/text-table" "*"
+    "@types/yeoman-generator" "*"
+    chalk "^4.1.0"
+    rxjs ">=6.4.0"
+
+"@types/yeoman-generator@*", "@types/yeoman-generator@^4.11.3":
+  version "4.11.3"
+  resolved "https://registry.npm.taobao.org/@types/yeoman-generator/download/@types/yeoman-generator-4.11.3.tgz#3b4c0040cf0c28237dd9f535a15c620d3f68c5f4"
+  integrity sha1-O0wAQM8MKCN92fU1oVxiDT9oxfQ=
+  dependencies:
+    "@types/debug" "*"
+    "@types/ejs" "*"
+    "@types/inquirer" "*"
+    "@types/mem-fs-editor" "*"
+    "@types/yeoman-environment" "*"
+    rxjs ">=6.4.0"
+
+"@types/yosay@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.npm.taobao.org/@types/yosay/download/@types/yosay-0.0.29.tgz#aafe08afc65a62867523772b86e3579765d71fff"
+  integrity sha1-qv4Ir8ZaYoZ1I3crhuNXl2XXH/8=
 
 "@typescript-eslint/eslint-plugin@^2.31.0":
   version "2.34.0"
@@ -4704,7 +4802,7 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   dependencies:
     aproba "^1.1.1"
 
-rxjs@^6.4.0, rxjs@^6.6.0:
+rxjs@>=6.4.0, rxjs@^6.4.0, rxjs@^6.6.0:
   version "6.6.3"
   resolved "https://registry.npm.taobao.org/rxjs/download/rxjs-6.6.3.tgz?cache=0&sync_timestamp=1599403316355&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Frxjs%2Fdownload%2Frxjs-6.6.3.tgz#8ca84635c4daa900c0d3967a6ee7ac60271ee552"
   integrity sha1-jKhGNcTaqQDA05Z6buesYCce5VI=
