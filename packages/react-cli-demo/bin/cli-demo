@@ -1,9 +1,0 @@
-#!/usr/bin/env node
-
-'use strict';
-
-// prod
-// require('../lib/cli-demo')();
-
-// dev
-(require('../dist/index').default)();
